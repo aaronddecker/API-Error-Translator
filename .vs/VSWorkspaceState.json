@@ -1,6 +1,8 @@
 {
   "ExpandedNodes": [
     "",
+    "\\frontend",
+    "\\frontend\\src",
     "\\src",
     "\\src\\main",
     "\\src\\main\\java",
@@ -8,6 +10,6 @@
     "\\src\\main\\java\\com\\example",
     "\\src\\main\\java\\com\\example\\demo"
   ],
-  "SelectedNode": "\\src\\main\\java\\com\\example\\demo\\Application.java",
+  "SelectedNode": "\\frontend\\src\\App.js",
   "PreviewInSolutionExplorer": false
 }
