@@ -68,7 +68,7 @@ public class ErrorAnalysisService {
             ),
 
             new ErrorPattern(
-                "nullpointerexception",
+                "nullpointer",
                 "A variable is null when accessed.",
                 List.of(
                     "Initialize the variable",

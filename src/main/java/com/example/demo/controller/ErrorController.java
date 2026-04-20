@@ -4,6 +4,7 @@ import com.example.demo.service.AnalysisResult;
 import com.example.demo.service.ErrorAnalysisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import java.util.Map;
 
 /**
  * REST Controller for the API Error Translator.
@@ -23,9 +24,10 @@ public class ErrorController {
      * @return AnalysisResult containing explanations and suggested fixes
      */
     @PostMapping("/analyze")
-    public AnalysisResult analyzeError(@RequestBody String error){
-        return errorAnalysisService.analyze(error);
-    }
+public AnalysisResult analyzeError(@RequestBody Map<String, String> body) {
+    String error = body.get("error");
+    return errorAnalysisService.analyze(error);
+}
 
     /**
      * Optional GET endpoint to quickly test if API is running.

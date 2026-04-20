@@ -7,7 +7,9 @@ function App() {
 
     const analyzeError = async () => {
         try {
-            const response = await axios.post("http://localhost:8080/api/analyze", errorText);
+            const response = await axios.post("http://localhost:8080/api/analyze", {
+                error: errorText
+            });
             setResult(response.data);
         } catch (err) {
             console.error(err);
