@@ -6,55 +6,104 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Service class that analyzes error messages and provides explanations and suggested fixes.
- * This is the core logic of the API Error Translator.
+ * Service responsible for analyzing error messages
+ * and returning explanations and possible fixes.
  */
 @Service
 public class ErrorAnalysisService {
 
     /**
-     * Analyzes a given error string and returns explanations and possible fixes.
-     * @param error the raw error message or stacktrace
-     * @return AnalysisResult containing explanations and suggested fixes
+     * Internal class representing a known error pattern.
+     * Each pattern has:
+     * - a keyword to detect the error
+     * - an explanation
+     * - a list of possible fixes
+     */
+    private static class ErrorPattern {
+        String keyword;
+        String explanation;
+        List<String> fixes;
+
+        public ErrorPattern(String keyword, String explanation, List<String> fixes) {
+            this.keyword = keyword;
+            this.explanation = explanation;
+            this.fixes = fixes;
+        }
+    }
+
+    /**
+     * Main method that analyzes an error string.
+     * @param error raw error message from user
+     * @return AnalysisResult with explanations and fixes
      */
     public AnalysisResult analyze(String error) {
 
-        // Initialize result object
-        AnalysisResult result = new AnalysisResult();
-        result.setOriginalError(error);
+        // Normalize input (lowercase for easier matching)
+        String normalizedError = error.toLowerCase();
 
-        // Lists to store explanations and fixes
+        // Prepare result lists
         List<String> explanations = new ArrayList<>();
         List<String> possibleFixes = new ArrayList<>();
 
-        // ----- Simple pattern matching for common developer errors -----
+        // Define known error patterns
+        List<ErrorPattern> patterns = List.of(
 
-        // JavaScript: "map of undefined" error
-        if (error.contains("map") && error.contains("undefined")) {
-            explanations.add("You are calling map() on an undefined variable.");
-            possibleFixes.add("Check if the variable exists and is an array.");
-            possibleFixes.add("Validate API response before calling map().");
-            possibleFixes.add("Use optional chaining (variable?.map(...)).");
+            new ErrorPattern(
+                "map of undefined",
+                "You are calling map() on an undefined variable.",
+                List.of(
+                    "Check if the variable exists",
+                    "Ensure API response is correct",
+                    "Use optional chaining (variable?.map(...))"
+                )
+            ),
 
-        // Generic JS/TS: "cannot read property" error
-        } else if (error.contains("cannot read property")) {
-            explanations.add("You are trying to access a property of undefined or null.");
-            possibleFixes.add("Ensure the object exists before accessing the property.");
-            possibleFixes.add("Check API responses and variable assignments.");
+            new ErrorPattern(
+                "cannot read property",
+                "You are trying to access a property of undefined or null.",
+                List.of(
+                    "Check if the object exists",
+                    "Validate API response before accessing properties"
+                )
+            ),
 
-        // Java: Null Pointer Exception
-        } else if (error.contains("null pointer exception")) {
-            explanations.add("A variable is null when you tried to use it.");
-            possibleFixes.add("Initialize the variable properly.");
-            possibleFixes.add("Add null checks before using it.");
+            new ErrorPattern(
+                "nullpointerexception",
+                "A variable is null when accessed.",
+                List.of(
+                    "Initialize the variable",
+                    "Add null checks before usage"
+                )
+            ),
 
-        // Default case: unknown error
-        } else {
+            new ErrorPattern(
+                "undefined is not a function",
+                "You are calling something that is not a function.",
+                List.of(
+                    "Check imports",
+                    "Ensure the function exists",
+                    "Verify variable types"
+                )
+            )
+        );
+
+        // Match error against known patterns
+        for (ErrorPattern pattern : patterns) {
+            if (normalizedError.contains(pattern.keyword)) {
+                explanations.add(pattern.explanation);
+                possibleFixes.addAll(pattern.fixes);
+            }
+        }
+
+        // Fallback if no pattern matched
+        if (explanations.isEmpty()) {
             explanations.add("No known pattern matched. Try a more specific error message.");
             possibleFixes.add("Check documentation or search online.");
         }
 
-        // Set results
+        // Build result object
+        AnalysisResult result = new AnalysisResult();
+        result.setOriginalError(error);
         result.setExplanations(explanations);
         result.setPossibleFixes(possibleFixes);
 
